@@ -2,8 +2,8 @@ import pygame
 import random
 
 pygame.init()
-display_with = 1600
-display_height = 900
+# display_with = 1600
+# display_height = 900
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (237, 28, 36)
@@ -18,26 +18,49 @@ large_text = pygame.font.Font('./assets/DroidSans.ttf', 115)
 small_text = pygame.font.Font('./assets/DroidSans.ttf', 20)
 
 car_with = 124
-
-game_display = pygame.display.set_mode((display_with, display_height))
+infoObject = pygame.display.Info()
+print('inforObject', infoObject)
+print('DISPLAY:', infoObject.current_w, infoObject.current_h)
+display_with = infoObject.current_w
+display_height = infoObject.current_h
+scale_w = infoObject.current_w/1600
+scale_h = infoObject.current_h/900
+print('SCALE X/Y', scale_w, scale_h)
+game_display = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
+# game_display = pygame.display.set_mode((display_with, display_height))
 pygame.display.set_caption('My Obstacles')
 clock = pygame.time.Clock()
 
 car_img = pygame.image.load('./assets/race_car.png')
 
 
-def things_doged(count):
+def scale_object(width, height):
+    scaled_h = height*scale_h
+    scaled_w = width*scale_w
+    return scaled_w, scaled_h
+
+
+def scale_placement(x, y):
+    scaled_x = x * scale_w
+    scaled_y = y * scale_h
+    return scaled_x, scaled_y
+
+
+def things_dodged(count):
     font = pygame.font.SysFont(None, 25)
-    text = font.render("doged: " + str(count), True, black)
+    text = font.render("dodged: " + str(count), True, black)
     game_display.blit(text, (0, 0))
 
 
-def things(thing_x, thing_y, thing_w, thing_h, color):
-    pygame.draw.rect(game_display, color, [thing_x, thing_y, thing_w, thing_h])
+def road_blocks(thing_x, thing_y, thing_w, thing_h, color):
+    pt_x, pt_y = scale_placement(thing_x, thing_y)
+    pt_w, pt_h = scale_object(thing_w, thing_h)
+    pygame.draw.rect(game_display, color, [pt_x, pt_y, pt_w, pt_h])
 
 
 def car(x, y):
-    game_display.blit(car_img, (x, y))
+    sx, sy = scale_placement(x, y)
+    game_display.blit(car_img, (sx, sy))
 
 
 def text_objects(text, font):
@@ -47,9 +70,9 @@ def text_objects(text, font):
 
 def message_display(text):
     # large_text
-    text_suface, text_rectangle = text_objects(text, large_text)
+    text_surface, text_rectangle = text_objects(text, large_text)
     text_rectangle.center = ((display_with / 2), (display_height / 2))
-    game_display.blit(text_suface, text_rectangle)
+    game_display.blit(text_surface, text_rectangle)
     pygame.display.update()
     pygame.time.wait(5000)
     game_loop()
@@ -67,9 +90,8 @@ def crashed():
         text_suface, text_rectangle = text_objects('You Crashed', large_text)
         text_rectangle.center = ((display_with / 2), (display_height / 2))
         game_display.blit(text_suface, text_rectangle)
-
-        buton('Retry', 400, 600, 160, 100, blue, green, game_loop)
-        buton('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
+        button('Retry', 400, 600, 160, 100, blue, green, game_loop)
+        button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
 
         pygame.display.update()
         clock.tick(60)
@@ -100,39 +122,27 @@ def display_menu(bg_color, button_list):
     game_display.fill(bg_color)
     for button_def in button_list:
         print(repr(button_def))
-        buton(button_def[0], button_def[1], button_def[2], button_def[3], button_def[4], button_def[5], button_def[6],
-              button_def[7])
+        button(button_def[0], button_def[1], button_def[2], button_def[3], button_def[4], button_def[5], button_def[6],
+               button_def[7])
     pygame.display.flip()
     clock.tick(60)
 
 
-def buton(msg, x, y, w, h, ic, ac, action=None):
+def button(msg, t_x, t_y, t_w, t_h, ic, ac, action=None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
+    x, y = scale_placement(t_x, t_y)
+    w, h = scale_object(t_w, t_h)
     if x + w > mouse[0] > x and y + h > mouse[1] > y:
-        pygame.draw.rect(game_display, blue, (x, y, w, h))
-        if click[0] ==\
-                1 and action is not None:
+        pygame.draw.rect(game_display, ic, (x, y, w, h))
+        if click[0] == 1 and action is not None:
             action()
-            # if action == 'play':
-            #     game_loop()
-            # elif action == 'quit':
-            #     pygame.quit()
-            #     quit()
     else:
-        pygame.draw.rect(game_display, green, (x, y, w, h))
+        pygame.draw.rect(game_display, ac, (x, y, w, h))
     # small_text
-    text_suface, text_rectangle = text_objects(msg, small_text)
+    text_surface, text_rectangle = text_objects(msg, small_text)
     text_rectangle.center = ((x + (w / 2)), (y + (h / 2)))
-    game_display.blit(text_suface, text_rectangle)
-    if 1050 + 150 > mouse[0] > 1050 and 600 + 100 > mouse[1] > 600:
-        pygame.draw.rect(game_display, ic, (1050, 600, 150, 100))
-    else:
-        pygame.draw.rect(game_display, ac, (1050, 600, 150, 100))
-    # small_text
-    text_suface, text_rectangle = text_objects('QUIT', small_text)
-    text_rectangle.center = ((1050 + (150 / 2)), (600 + (100 / 2)))
-    game_display.blit(text_suface, text_rectangle)
+    game_display.blit(text_surface, text_rectangle)
 
 
 def game_unpause():
@@ -148,11 +158,11 @@ def game_paused():
         game_display.fill(white)
         # large_text
         text_suface, text_rectangle = text_objects('Game Paused', large_text)
-        text_rectangle.center = ((display_with / 2), (display_height / 2))
+        text_rectangle.center = ((display_with / 2), (display_height / 3))
         game_display.blit(text_suface, text_rectangle)
         # print('PAUSED')
-        buton('Continue', 400, 600, 160, 100, blue, green, game_unpause)
-        buton('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
+        button('Continue', 400, 600, 160, 100, blue, green, game_unpause)
+        button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
 
         pygame.display.update()
         clock.tick(60)
@@ -166,13 +176,11 @@ def game_intro():
                 game_quit()
         game_display.fill(white)
         # large_text
-        text_suface, text_rectangle = text_objects('My Obstacles', large_text)
-        text_rectangle.center = ((display_with / 2), (display_height / 2))
-        game_display.blit(text_suface, text_rectangle)
-
-        buton('GO!', 400, 600, 150, 100, blue, green, game_loop)
-        buton('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
-
+        text_surface, text_rectangle = text_objects('My Obstacles', large_text)
+        text_rectangle.center = ((display_with / 2), (display_height / 3))
+        game_display.blit(text_surface, text_rectangle)
+        button('GO!', 400, 600, 150, 100, blue, green, game_loop)
+        button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
         pygame.display.update()
         clock.tick(60)
 
@@ -184,14 +192,11 @@ def game_loop():
     y = (display_height * 0.8)
     x_change = 0
     y_change = 0
-
     thing_startx = random.randrange(0, display_with)
     thing_starty = -600
     thing_speed = 4
-    thing_with = 170
-    thing_hight = 170
-
-    doged = 0
+    obstacle_width, obstacle_height = scale_object(170, 170)
+    dodged = 0
 
     game_exit = False
 
@@ -227,21 +232,23 @@ def game_loop():
         x += x_change
         game_display.fill(green)
 
+        thing_startx
+
         # things(thing_x, thing_y, thing_w, thing_h, color)
-        things(thing_startx, thing_starty, thing_with, thing_hight, red)
+        road_blocks(thing_startx, thing_starty, obstacle_width, obstacle_height, blue)
         thing_starty += thing_speed
         car(x, y)
-        things_doged(doged)
+        things_dodged(dodged)
         if x > display_with - car_with or x < 0:
             crashed()
         if thing_starty > display_height:
-            thing_starty = 0 - thing_hight
+            thing_starty = 0 - obstacle_height
             thing_startx = random.randrange(0, display_with)
-            doged += 1
+            dodged += 1
             thing_speed += .1
 
-        if y < thing_starty + thing_hight:
-            if x > thing_startx and x < thing_startx + thing_with or x + car_with > thing_startx and x + car_with < thing_startx + thing_with:
+        if y < thing_starty + obstacle_height:
+            if x > thing_startx and x < thing_startx + obstacle_width or x + car_with > thing_startx and x + car_with < thing_startx + obstacle_width:
                 crashed()
 
         pygame.display.update()
