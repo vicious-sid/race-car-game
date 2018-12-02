@@ -102,20 +102,9 @@ def game_quit():
     quit()
 
 
-# def troll_intro():
-#     while troll:
-#         troll_button = [('Click Me', 400, 600, 160, 100, blue, green, troll_intro),
-#                         ('no seriosley', 400, 200, 160, 100, blue, green, troll_intro),
-#                         ('i mean it', 500, 100, 160, 100, blue, green, troll_intro),
-#                         ]
-#         i = 0
-#         for i in range(0, 2):
-#             for event in pygame.event.get():
-#                 if event.type == pygame.QUIT:
-#                     game_quit()
-#             button_list = [troll_button[i]]
-#             display_menu(white, button_list)
-#             i += 1
+def menu():
+    import menu
+    menu.game_menu()
 
 
 def display_menu(bg_color, button_list):
@@ -180,7 +169,7 @@ def game_intro():
         text_rectangle.center = ((display_with / 2), (display_height / 3))
         game_display.blit(text_surface, text_rectangle)
         button('GO!', 400, 600, 150, 100, blue, green, game_loop)
-        button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
+        button('BACK', 1050, 600, 150, 100, dark_red, red, menu)
         pygame.display.update()
         clock.tick(60)
 
