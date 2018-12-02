@@ -3,6 +3,8 @@ import os
 import random
 
 pygame.init()
+# display_with = 1600
+# display_height = 900
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (237, 28, 36)
@@ -22,7 +24,8 @@ scale_w = infoObject.current_w/1600
 scale_h = infoObject.current_h/900
 print('SCALE X/Y', scale_w, scale_h)
 game_display = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
-pygame.display.set_caption("Vicious Games")
+# game_display = pygame.display.set_mode((display_with, display_height))
+pygame.display.set_caption('Platformer')
 clock = pygame.time.Clock()
 
 
@@ -57,14 +60,10 @@ def game_quit():
     quit()
 
 
-def game_obstacles():
-    import obsticles
-    obsticles.game_intro()
+def menu():
+    import menu
+    menu.game_menu()
 
-
-def game_platformer():
-    import platformer
-    platformer.platformer_game_intro()
 
 def display_menu(bg_color, button_list):
     game_display.fill(bg_color)
@@ -93,7 +92,30 @@ def button(msg, t_x, t_y, t_w, t_h, ic, ac, action=None):
     game_display.blit(text_surface, text_rectangle)
 
 
-def game_menu():
+def game_unpause():
+    global pause
+    pause = False
+
+
+def game_paused():
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_quit()
+        game_display.fill(white)
+        # large_text
+        text_suface, text_rectangle = text_objects('Game Paused', large_text)
+        text_rectangle.center = ((display_with / 2), (display_height / 3))
+        game_display.blit(text_suface, text_rectangle)
+        # print('PAUSED')
+        button('Continue', 400, 600, 160, 100, blue, green, game_unpause)
+        button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
+
+        pygame.display.update()
+        clock.tick(60)
+
+
+def platformer_game_intro():
     intro = True
     while intro:
         for event in pygame.event.get():
@@ -101,15 +123,11 @@ def game_menu():
                 game_quit()
         game_display.fill(white)
         # large_text
-        text_surface, text_rectangle = text_objects('Vicious Games', large_text)
-        text_rectangle.center = ((display_with / 2), (display_height / 9))
+        text_surface, text_rectangle = text_objects('platformer', large_text)
+        text_rectangle.center = ((display_with / 2), (display_height / 4))
         game_display.blit(text_surface, text_rectangle)
-        # button('GO!', 400, 600, 150, 100, blue, green, game_loop)
-        # button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
-        button("Obstacles", 100, 200, 150, 100, blue, green, game_obstacles)
-        button("platformer", 300, 200, 150,100, green, blue, game_platformer)
-        button("QUIT", 100, 50, 150, 100, dark_red, red, game_quit)
+        button('GO!', 400, 600, 150, 100, blue, green, game_quit)
+        button('BACK', 1050, 600, 150, 100, dark_red, red, menu)
         pygame.display.update()
         clock.tick(60)
 
-game_menu()

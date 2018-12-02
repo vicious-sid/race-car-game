@@ -90,8 +90,8 @@ def crashed():
         text_suface, text_rectangle = text_objects('You Crashed', large_text)
         text_rectangle.center = ((display_with / 2), (display_height / 2))
         game_display.blit(text_suface, text_rectangle)
-        button('Retry', 400, 600, 160, 100, blue, green, game_loop)
-        button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
+        button('Retry', 400, 600, 150, 100, blue, green, game_loop)
+        button('MENU', 1050, 600, 150, 100, dark_red, red, menu)
 
         pygame.display.update()
         clock.tick(60)
@@ -150,8 +150,8 @@ def game_paused():
         text_rectangle.center = ((display_with / 2), (display_height / 3))
         game_display.blit(text_suface, text_rectangle)
         # print('PAUSED')
-        button('Continue', 400, 600, 160, 100, blue, green, game_unpause)
-        button('QUIT', 1050, 600, 150, 100, dark_red, red, game_quit)
+        button('Continue', 400, 600, 150, 100, blue, green, game_unpause)
+        button('MENU', 1050, 600, 150, 100, dark_red, red, menu)
 
         pygame.display.update()
         clock.tick(60)
@@ -168,8 +168,8 @@ def game_intro():
         text_surface, text_rectangle = text_objects('My Obstacles', large_text)
         text_rectangle.center = ((display_with / 2), (display_height / 3))
         game_display.blit(text_surface, text_rectangle)
-        button('GO!', 400, 600, 150, 100, blue, green, game_loop)
-        button('BACK', 1050, 600, 150, 100, dark_red, red, menu)
+        button('GO!', 400, 600, 152, 100, blue, green, game_loop)
+        button('BACK', 1050, 600, 152, 100, dark_red, red, menu)
         pygame.display.update()
         clock.tick(60)
 
@@ -224,7 +224,7 @@ def game_loop():
         thing_startx
 
         # things(thing_x, thing_y, thing_w, thing_h, color)
-        road_blocks(thing_startx, thing_starty, obstacle_width, obstacle_height, blue)
+        road_blocks(thing_startx, thing_starty, obstacle_width, obstacle_height, red)
         thing_starty += thing_speed
         car(x, y)
         things_dodged(dodged)
